@@ -1,0 +1,17 @@
+.navbar-custom {
+}
+.navbar-custom .navbar-brand,
+.navbar-custom .navbar-text {
+    font-size: 2.0rem;
+    color: #000000;
+}
+
+.navbar-brand
+{
+
+    text-align: center;
+    margin: auto;
+}
+.hidden {
+    visibility: hidden;
+}
