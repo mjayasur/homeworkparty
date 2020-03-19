@@ -62,7 +62,7 @@ class VideoChat extends React.Component {
 }
 
   componentDidMount() {
-    let sock = openSocket('10.0.0.150:3001/')
+    let sock = openSocket('localhost:3001')
 
     this.setState({socket : sock})
 
@@ -93,6 +93,8 @@ class VideoChat extends React.Component {
     });
     this.playVideoFromCamera();
 
+    sock.emit('getRoomUsers', this.props.room)
+
 
     const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
 
@@ -103,7 +105,7 @@ class VideoChat extends React.Component {
             peerConnection.setRemoteDescription(new RTCSessionDescription(message.offer));
             var answer = await peerConnection.createAnswer();
             await peerConnection.setLocalDescription(answer);
-            sock.emit({'answer': answer});
+            sock.emit('answer', answer);
         }
     });
 

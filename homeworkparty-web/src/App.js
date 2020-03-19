@@ -1,67 +1,70 @@
 import React from 'react';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import './App.css';
-import VideoChat from './VideoChat';
-import TextChat from './components/TextChat';
-import LoginPage from './LoginPage';
-import firebase from 'firebase';
-import Home from './Home';
-import { connect } from 'react-redux';
-
-// Configure Firebase.
-const config = {
-  apiKey: 'AIzaSyC3mxPhnVBGqpGv0pH6L923xmluzKPsoTU',
-  authDomain: 'homeworkparty-79bf2.firebaseapp.com',
-
-};
-firebase.initializeApp(config);
-
-
-
-
+import Navbar from './Navbar';
+import GetDisplayName from './GetDisplayName';
+import openSocket from 'socket.io-client';
+import AllRooms from './AllRooms';
+import Room from './Room';
 class App extends React.Component {
+
   constructor(props) {
-    super(props)
+    super(props);
+    this.state = {
+      displayName : "",
+      page : 0,
+      socket : null,
+      room : ""
+    }
+  }
+
+  getDisplayName = (name) => {
+
+    this.setState({
+      displayName : name,
+      page : 1
+    })
+    
+  }
+  joinRoom = (room) => {
+    this.setState({
+      room, page : 2
+    })
+    
+  }
 
   
+  render () {
+    if (this.state.page === 0) {
+      return (
+      
+        <div className="App">
+            <div className = "mb-5">
+            <Navbar/>
+          </div>
+          <div className = "mt-5">
+            <GetDisplayName getDisplayName = {this.getDisplayName}/>
+          </div>
+        </div>
+      );        
+    } else if (this.state.page === 1) {
+      return (
+        <AllRooms socket={this.state.socket} joinRoom = {this.joinRoom}/>
+      );
+    } else if (this.state.page === 2) {
+      return (
+        <Room socket={this.state.socket} room={this.state.room} user={this.state.displayName} />
+      );
+    }
+
   }
   componentDidMount() {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.props.logIn();
+    let socket = openSocket('localhost:3001/')
+    this.setState({
+        socket,
 
-      }
     })
   }
 
-  render() {
-
-
-    return (
-      <div className="App">
-        {/* <Provider store={store}> */}
-          <Router>
-            <Switch>
-              <Route path='/video-chat' component = {VideoChat}/>
-              <Route path='/text-chat' component = {TextChat} />
-              <Route path='/login' component = {LoginPage} />
-              <Route path='/' component = {Home} />
-            </Switch>
-          </Router>
-        {/* </Provider> */}
-      </div>
-    );
-  }
-}
-const mapStateToProps = state => {
-  return {
-      isLogged : state.isLogged
-  }
-}
-const mapDispatchToProps = dispatch => {
-  return {
-    logIn : () => { dispatch({ type: 'LOG'}) }
-  }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App);
+export default App;

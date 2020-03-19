@@ -11,10 +11,12 @@ class TextChat extends React.Component {
       loading : true
     };
     this.scrollRef = React.createRef()
+    this.inputRef = React.createRef()
   }
 
   sendMessage = () => {
-      this.state.socket.emit('send-message', this.state.message, this.props.user)
+      this.state.socket.emit('chat-message-offer', this.props.room, this.props.user, this.state.message);
+      this.inputRef.current.value = ""
   }
   processInput = (e) => {
     this.setState({message : e.target.value})
@@ -60,9 +62,9 @@ class TextChat extends React.Component {
 
                     <div class="row">
                         <div class="col">
-                            <input type="text"  onKeyUp={this.processInput} class="form-control" placeholder="Type your message"/>
+                            <input ref={this.inputRef} type="text"  onKeyUp={this.processInput} class="form-control" placeholder="Type your message"/>
                         </div>
-                        <button class="btn btn-primary " onClick={this.sendMessage} >Send message</button>
+                        <button class="btn btn-primary " onClick={() => {this.sendMessage();}} >Send message</button>
 
                     </div>
 
@@ -75,15 +77,16 @@ class TextChat extends React.Component {
   }
 
   componentDidMount() {
-    let sock = openSocket('10.0.0.150:3001/')
+    
     this.setState({
-        socket : sock,
+        socket : this.props.socket,
 
     })
+    
 
-    sock.on("send-back", (msg, user) => {
+    this.props.socket.on("chat-message", (user, msg) => {
 
-
+        console.log("hello from chat-message")
         this.setState({
             chat : [...this.state.chat, 
             <li class="list-group-item mt-2">
@@ -95,9 +98,7 @@ class TextChat extends React.Component {
         
         
     })
-    console.log(this.props.school)
 
-    // this.state.socket.emit('log-on', this.state.message)
 
     
     this.setState({

@@ -37,9 +37,7 @@ class LoginPage extends React.Component {
     this.setState({schoolChosen:pressed});
   }
   render() {
-    if (this.props.isLogged) {
-      return (<Redirect to="/" />);
-    }
+
     let schoolButtons = [
       <button class="dropdown-item" href="" id="UC Berkeley" onClick = {this.selectSchool}>UC Berkeley</button>,
     

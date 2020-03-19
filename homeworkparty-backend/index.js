@@ -1,29 +1,55 @@
-var app = require('express')();
-var http = require('https').createServer(app);
-var io = require('socket.io')(http);
+var express = require('express');
 
+var cors = require('cors')
+
+var app = require('express')();
+app.use(cors())
+
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
+app.use(express.json());      
+app.use(express.urlencoded());
+
+app.options('*', cors());
+var rooms = ["UC Berkeley"]
 app.get('/', function(req, res){
   res.send('<h1>Hello world</h1>');
 });
-
-let rooms = {"UC Berkeley" : {onlineUsers : []}, "UCLA" : {onlineUsers : []}}
+app.get('/number-of-clients', function(req, res){
+  res.send(NumClientsInRoom('/', req.query.room));
+});
+app.get('/rooms', function(req, res){
+  res.send(rooms);
+});
+function NumClientsInRoom(namespace, room) {
+  var clients = io.nsps[namespace].adapter.rooms[room];
+  return Object.keys(clients).length;
+}
 
 io.on('connection', function(socket){
-    console.log('a user connected');
+    console.log('User Connected');
 
     socket.on('disconnect', function(){
-        console.log('user disconnected');
-      });
-    socket.on('send-message', function(msg, user){
-        console.log('message received: ' + msg, user);
-        io.emit('send-back', msg, user)
+        console.log('User Disconnected');
+
     });
-    socket.on('log-on', function(packet) {
-      let userName = packet.userName
-      let userObj = {userName : socket} 
-      rooms[packet.room].onlineUsers.push( );
-      console.log(rooms);
-    })
+    socket.on('create-room', function(room){
+      console.log(room)
+      rooms.push(room)
+
+
+    });
+    socket.on('join-room', function(room){
+      console.log("Someone just joined: " + room)
+      socket.join(room);
+
+    });
+    socket.on('chat-message-offer', function(room, user, msg){
+        console.log(user + ' says: "' + msg + '" in room: ' + room);
+        io.to(room).emit('chat-message', user, msg)
+        
+    });
+    
 });
 
 
