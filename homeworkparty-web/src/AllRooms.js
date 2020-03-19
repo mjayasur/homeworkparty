@@ -20,7 +20,7 @@ class AllRooms extends React.Component {
     this.props.socket.emit("create-room", room);
 
 
-    axios.get('http://localhost:3001/rooms')
+    axios.get('http://54.153.14.29:3001/rooms')
     .then( (response) => {
       console.log(response);
       this.setState({
@@ -87,7 +87,7 @@ class AllRooms extends React.Component {
 
   componentDidMount() {
 
-    axios.get('http://localhost:3001/rooms')
+    axios.get('http://54.153.14.29:3001/rooms')
       .then( (response) => {
         console.log(response);
         this.setState({

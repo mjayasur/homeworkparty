@@ -58,7 +58,7 @@ class App extends React.Component {
 
   }
   componentDidMount() {
-    let socket = openSocket('localhost:3001/')
+    let socket = openSocket('54.153.14.29:3001/')
     this.setState({
         socket,
 
